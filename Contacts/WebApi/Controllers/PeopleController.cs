@@ -30,9 +30,11 @@ public class PeopleController : ControllerBase
 
     [HttpGet]
     [Route("{id:guid}")]
-    public IActionResult GetPersonById(Guid id)
+    public async Task<IActionResult> GetPersonById(Guid id)
     {
-        // Placeholder for fetching a person by ID (future feature)
-        return Ok($"Person with ID {id} (Stub Response)");
+        var person = await peopleService.GetPersonById(id);
+        if (person is null) return NotFound(new { Message = $"Person with ID {id} was not found." });
+
+        return Ok(person);
     }
 }

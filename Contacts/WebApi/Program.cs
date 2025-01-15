@@ -31,9 +31,9 @@ builder.Services.AddSwaggerGen(c =>
         .Version?
         .ToString() ?? "1.0.0";
 
-    c.SwaggerDoc("Person", new OpenApiInfo
+    c.SwaggerDoc("People", new OpenApiInfo
     {
-        Title = "Person API",
+        Title = "People API",
         Version = version
     });
 });
@@ -45,7 +45,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/Person/swagger.json", "Person API");
+        c.SwaggerEndpoint("/swagger/People/swagger.json", "People API");
     });
 }
 

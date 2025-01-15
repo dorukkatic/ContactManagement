@@ -1,5 +1,6 @@
 ﻿using Contacts.Contracts.People;
 using Contacts.DataAccess;
+using Contacts.Domain;
 
 namespace Contacts.Application.People;
 
@@ -21,5 +22,14 @@ public class PeopleService : IPeopleService
         db.SaveChanges();
 
         return Task.FromResult(person.Id);
+    }
+
+    public async Task<PersonResponse?> GetPersonById(Guid id)
+    {
+        var person = await db.People.FindAsync(id);
+        if (person is null) return null;
+        
+        var mapper = new PersonMapper();
+        return mapper.PersonToPersonResponse(person);
     }
 }

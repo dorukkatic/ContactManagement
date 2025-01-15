@@ -20,6 +20,7 @@ public static class ServiceRegistration
         
         services.AddScoped<IPeopleService, PeopleService>();
         services.AddFluentValidation();
+        services.AddSingleton(TimeProvider.System);
 
         return services;
     }
