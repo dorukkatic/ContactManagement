@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Contracts\Contacts.Contracts.csproj" />
+    <ProjectReference Include="..\DataAccess\Contacts.DataAccess.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Riok.Mapperly" Version="4.1.1" />
+  </ItemGroup>
+
 </Project>
