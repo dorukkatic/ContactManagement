@@ -13,11 +13,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contacts.DataAccess", "Cont
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contacts.DependencyInjection", "Contacts\DependencyInjection\Contacts.DependencyInjection.csproj", "{5A5FA48C-9215-4DFC-8024-B9B3E157CFA8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Contracts", "Contracts", "{C5365758-21D3-4244-A78D-120FCA6095F8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Contacts", "Contacts", "{C5365758-21D3-4244-A78D-120FCA6095F8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{79F39A86-ACEA-4BA7-AB90-C97384C2C9F6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts.Tests", "Contracts.UnitTests\Contracts.Tests.csproj", "{58467645-CF0E-40F0-BBAF-2B5DD848C705}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contacts.Contracts", "Contacts\Contracts\Contacts.Contracts.csproj", "{54B8C865-B8D2-40BB-B91B-65B8AC1B0D0A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,6 +51,10 @@ Global
 		{58467645-CF0E-40F0-BBAF-2B5DD848C705}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58467645-CF0E-40F0-BBAF-2B5DD848C705}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58467645-CF0E-40F0-BBAF-2B5DD848C705}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54B8C865-B8D2-40BB-B91B-65B8AC1B0D0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54B8C865-B8D2-40BB-B91B-65B8AC1B0D0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54B8C865-B8D2-40BB-B91B-65B8AC1B0D0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54B8C865-B8D2-40BB-B91B-65B8AC1B0D0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -61,5 +67,6 @@ Global
 		{5A5FA48C-9215-4DFC-8024-B9B3E157CFA8} = {C5365758-21D3-4244-A78D-120FCA6095F8}
 		{79F39A86-ACEA-4BA7-AB90-C97384C2C9F6} = {C5365758-21D3-4244-A78D-120FCA6095F8}
 		{58467645-CF0E-40F0-BBAF-2B5DD848C705} = {79F39A86-ACEA-4BA7-AB90-C97384C2C9F6}
+		{54B8C865-B8D2-40BB-B91B-65B8AC1B0D0A} = {C5365758-21D3-4244-A78D-120FCA6095F8}
 	EndGlobalSection
 EndGlobal
