@@ -1,4 +1,7 @@
-﻿using Contacts.DataAccess;
+﻿using Contacts.Application;
+using Contacts.Application.Person;
+using Contacts.Contracts.Person;
+using Contacts.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +15,8 @@ public static class ServiceRegistration
     {
         services.AddDbContext<ContactsDbContext>(options =>
             options.UseNpgsql(connectionString));
+        
+        services.AddScoped<IPersonService, PersonService>();
 
         return services;
     }
