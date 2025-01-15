@@ -1,7 +1,7 @@
 ﻿using Contacts.Application;
-using Contacts.Application.Person;
+using Contacts.Application.People;
 using Contacts.Contracts;
-using Contacts.Contracts.Person;
+using Contacts.Contracts.People;
 using Contacts.DataAccess;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;

@@ -1,4 +1,4 @@
-﻿using Contacts.Contracts.Person;
+﻿using Contacts.Contracts.People;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Contacts.WebApi.Controllers;

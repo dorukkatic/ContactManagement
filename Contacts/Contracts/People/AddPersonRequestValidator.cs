@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Contacts.Contracts.Person;
+namespace Contacts.Contracts.People;
 
 public class AddPersonRequestValidator : AbstractValidator<AddPersonRequest>
 {

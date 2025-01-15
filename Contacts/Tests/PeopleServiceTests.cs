@@ -1,7 +1,7 @@
 ﻿using Bogus;
 using Contacts.Application;
-using Contacts.Application.Person;
-using Contacts.Contracts.Person;
+using Contacts.Application.People;
+using Contacts.Contracts.People;
 using Contacts.DataAccess;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;

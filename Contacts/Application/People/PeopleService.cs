@@ -1,7 +1,7 @@
-﻿using Contacts.Contracts.Person;
+﻿using Contacts.Contracts.People;
 using Contacts.DataAccess;
 
-namespace Contacts.Application.Person;
+namespace Contacts.Application.People;
 
 public class PeopleService : IPeopleService
 {
