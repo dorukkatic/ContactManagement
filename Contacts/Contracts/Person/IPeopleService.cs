@@ -1,5 +1,5 @@
 ﻿namespace Contacts.Contracts.Person;
-public interface IPersonService
+public interface IPeopleService
 {
     Task<Guid> AddPerson(AddPersonRequest request);
 }

@@ -3,11 +3,11 @@ using Contacts.DataAccess;
 
 namespace Contacts.Application.Person;
 
-public class PersonService : IPersonService
+public class PeopleService : IPeopleService
 {
     private readonly ContactsDbContext db;
 
-    public PersonService(ContactsDbContext db)
+    public PeopleService(ContactsDbContext db)
     {
         this.db = db;
     }

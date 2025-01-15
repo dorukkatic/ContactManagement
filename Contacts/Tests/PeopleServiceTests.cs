@@ -8,12 +8,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Contracts.Application.Tests.Unit;
 
-public class PersonServiceTests
+public class PeopleServiceTests
 {
     private readonly ContactsDbContext db;
-    private readonly PersonService personService;
+    private readonly PeopleService peopleService;
 
-    public PersonServiceTests()
+    public PeopleServiceTests()
     {
         var options = 
             new DbContextOptionsBuilder<ContactsDbContext>()
@@ -24,7 +24,7 @@ public class PersonServiceTests
 
         db.Database.EnsureCreated();
 
-        personService = new PersonService(db);
+        peopleService = new PeopleService(db);
     }
 
     [Theory]
@@ -41,7 +41,7 @@ public class PersonServiceTests
             company                
         );
 
-        var personId = await personService.AddPerson(request);
+        var personId = await peopleService.AddPerson(request);
 
         var person = await db.People.FindAsync(personId);
 
@@ -65,8 +65,8 @@ public class PersonServiceTests
             faker.Name.LastName(),
             faker.Company.CompanyName());
 
-        var personId1 = await personService.AddPerson(request1);
-        var personId2 = await personService.AddPerson(request2);
+        var personId1 = await peopleService.AddPerson(request1);
+        var personId2 = await peopleService.AddPerson(request2);
 
         personId1.Should().NotBe(personId2);
     }

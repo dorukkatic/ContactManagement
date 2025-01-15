@@ -1,7 +1,9 @@
 ﻿using Contacts.Application;
 using Contacts.Application.Person;
+using Contacts.Contracts;
 using Contacts.Contracts.Person;
 using Contacts.DataAccess;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,8 +18,15 @@ public static class ServiceRegistration
         services.AddDbContext<ContactsDbContext>(options =>
             options.UseNpgsql(connectionString));
         
-        services.AddScoped<IPersonService, PersonService>();
+        services.AddScoped<IPeopleService, PeopleService>();
+        services.AddFluentValidation();
 
+        return services;
+    }
+    
+    private static IServiceCollection AddFluentValidation(this IServiceCollection services)
+    {
+        services.AddValidatorsFromAssembly(typeof(AssemblyReference).Assembly);
         return services;
     }
 }

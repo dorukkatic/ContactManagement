@@ -1,5 +1,7 @@
+using System.Reflection;
 using Contacts.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,14 +13,29 @@ if(connectionString is null)
     throw new InvalidOperationException("Connection string 'ContactsDb' not found.");
 }
 
+builder.Services.AddFluentValidationAutoValidation(configuration =>
+{
+    configuration.DisableBuiltInModelValidation = true;
+    configuration.EnablePathBindingSourceAutomaticValidation = true;
+});
+
 builder.Services.AddContactsServices(connectionString);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Contacts API", Version = "v1" });
-    c.SwaggerDoc("Person", new OpenApiInfo { Title = "Person API", Version = "v1" });
+    var version = Assembly
+        .GetExecutingAssembly()
+        .GetName()
+        .Version?
+        .ToString() ?? "1.0.0";
+
+    c.SwaggerDoc("Person", new OpenApiInfo
+    {
+        Title = "Person API",
+        Version = version
+    });
 });
 
 var app = builder.Build();
@@ -28,8 +45,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Contacts API V1");
-        c.SwaggerEndpoint("/swagger/Person/swagger.json", "Person API V1");
+        c.SwaggerEndpoint("/swagger/Person/swagger.json", "Person API");
     });
 }
 

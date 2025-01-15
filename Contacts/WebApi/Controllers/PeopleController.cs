@@ -4,15 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace Contacts.WebApi.Controllers;
 
 [ApiController]
-[ApiExplorerSettings(GroupName = "Person")]
-[Route("person")]
-public class PersonController : ControllerBase
+[ApiExplorerSettings(GroupName = "People")]
+[Route("people")]
+public class PeopleController : ControllerBase
 {
-    private readonly IPersonService personService;
+    private readonly IPeopleService peopleService;
 
-    public PersonController(IPersonService personService)
+    public PeopleController(IPeopleService peopleService)
     {
-        this.personService = personService;
+        this.peopleService = peopleService;
     }
 
     /// <summary>
@@ -24,7 +24,7 @@ public class PersonController : ControllerBase
     [Route("")]
     public async Task<IActionResult> AddPerson([FromBody] AddPersonRequest person)
     {
-        var personId = await personService.AddPerson(person);
+        var personId = await peopleService.AddPerson(person);
         return CreatedAtAction(nameof(GetPersonById), new { id = personId }, null);
     }
 
