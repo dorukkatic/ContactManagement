@@ -16,6 +16,7 @@ public abstract class ContactsTestBase : IDisposable
     protected readonly Faker<AddPersonRequest> AddPersonFaker;
     protected readonly Faker<AddContactInfoRequest> AddContactInfoRequestFaker;
     protected readonly Faker<Person> PersonFaker;
+    protected readonly Faker<AddLocationRequest> AddLocationRequestFaker;
     protected readonly Date DateFaker = new Faker().Date;
     protected readonly FakeTimeProvider ContactsManagementTimeProvider = new();
     
@@ -47,6 +48,10 @@ public abstract class ContactsTestBase : IDisposable
                 .RuleFor(p => p.FirstName, f => f.Name.FirstName())
                 .RuleFor(p => p.LastName, f => f.Name.LastName())
                 .RuleFor(p => p.Company, f => f.Company.CompanyName());
+        
+        AddLocationRequestFaker =
+            new Faker<AddLocationRequest>()
+                .CustomInstantiator(f => new AddLocationRequest(f.Address.City()));
 
         AddContactInfoRequestFaker =
             new Faker<AddContactInfoRequest>()
@@ -58,7 +63,6 @@ public abstract class ContactsTestBase : IDisposable
                     {
                         ContactInfoTypeDTO.Email => f.Internet.Email(),
                         ContactInfoTypeDTO.Phone => f.Phone.PhoneNumber(),
-                        ContactInfoTypeDTO.Location => f.Address.City(),
                         _ => throw new ArgumentOutOfRangeException()
                     };
 
