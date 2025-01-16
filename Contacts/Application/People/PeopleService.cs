@@ -1,6 +1,8 @@
-﻿using Contacts.Contracts.People;
+﻿using Contacts.Contracts.Common;
+using Contacts.Contracts.People;
 using Contacts.DataAccess;
 using Contacts.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace Contacts.Application.People;
 
@@ -26,10 +28,49 @@ public class PeopleService : IPeopleService
 
     public async Task<PersonResponse?> GetPersonById(Guid id)
     {
-        var person = await db.People.FindAsync(id);
+        var person =
+            await db.People.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
         if (person is null) return null;
-        
+
         var mapper = new PersonMapper();
         return mapper.PersonToPersonResponse(person);
+    }
+
+    public async Task<PagedResponse<PersonResponse>> GetPeople(
+        int pageNumber,
+        int pageSize,
+        PeopleOrderByField orderBy,
+        bool isDescending,
+        CancellationToken cancellationToken)
+    {
+        var people = db.People.AsNoTracking();
+
+        var totalCount = await people.LongCountAsync(cancellationToken);
+
+        var skip = (pageNumber - 1) * pageSize;
+        if (skip >= totalCount)
+        {
+            return new PagedResponse<PersonResponse>(
+                pageNumber,
+                pageSize,
+                totalCount,
+                []);
+        }
+
+        var data =
+            await people
+                .ApplyOrdering(orderBy, isDescending)
+                .ApplyPaging(pageNumber, pageSize)
+                .Select(p =>
+                    new PersonResponse(
+                        p.Id,
+                        p.FirstName,
+                        p.LastName,
+                        p.Company,
+                        p.CreatedAt,
+                        p.UpdatedAt))
+                .ToListAsync(cancellationToken);
+
+        return new PagedResponse<PersonResponse>(pageNumber, pageSize, totalCount, data);
     }
 }
