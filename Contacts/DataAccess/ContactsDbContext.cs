@@ -10,6 +10,7 @@ public class ContactsDbContext : DbContext
     private readonly TimeProvider timeProvider;
     
     public DbSet<Person> People { get; set; }
+    public DbSet<ContactInfo> ContactInfos { get; set; } 
 
     public ContactsDbContext(DbContextOptions<ContactsDbContext> options, TimeProvider timeProvider)
         : base(options)
