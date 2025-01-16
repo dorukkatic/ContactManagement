@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>33735c24-3bfd-4422-9694-cb17b229523a</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <Version>1.0.0</Version>
+    <Version>0.1.0</Version>
     <PackageReleaseNotes>Add Person feature is implemented</PackageReleaseNotes>
   </PropertyGroup>
 
@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DependencyInjection\Contacts.DependencyInjection.csproj" />
+    <ProjectReference Include="..\DependencyInjection\ContactReports.DependencyInjection.csproj" />
   </ItemGroup>
 
 </Project>
