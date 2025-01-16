@@ -1,6 +1,7 @@
 ﻿using Contacts.Contracts.Common;
 using Contacts.Contracts.ContactInfos;
 using Contacts.Contracts.People;
+using FluentResults.Extensions.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Contacts.WebApi.Controllers;
@@ -78,7 +79,22 @@ public class PeopleController : ControllerBase
     [Route("{id:guid}/contact-info")]
     public async Task<IActionResult> AddContactInfoToPerson(Guid id, [FromBody] AddContactInfoRequest request)
     {
-        await contactInfosService.AddContactInfo(id, request);
-        return CreatedAtAction(nameof(GetPersonById), new { id = id }, null);
+        var result = await contactInfosService.AddContactInfo(id, request);
+        
+        return
+            result.IsFailed
+                ? result.ToActionResult()
+                : CreatedAtAction(nameof(GetPersonById), new { id = id }, null);
+    }
+    
+    [HttpPost]
+    [Route("{id:guid}/location")]
+    public async Task<IActionResult> AddLocationToPerson(Guid id, [FromBody] AddLocationRequest request)
+    {
+        var result = await contactInfosService.AddLocation(id, request);
+        return 
+            result.IsFailed 
+                ? result.ToActionResult() 
+                : CreatedAtAction(nameof(GetPersonById), new { id = id }, null);
     }
 }

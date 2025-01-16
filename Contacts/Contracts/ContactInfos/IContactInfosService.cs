@@ -1,6 +1,9 @@
-﻿namespace Contacts.Contracts.ContactInfos;
+﻿using FluentResults;
+
+namespace Contacts.Contracts.ContactInfos;
 
 public interface IContactInfosService
 {
-    Task<Guid> AddContactInfo(Guid personId, AddContactInfoRequest request);
+    Task<Result<Guid>> AddContactInfo(Guid personId, AddContactInfoRequest request);
+    Task<Result<Guid>> AddLocation(Guid personId, AddLocationRequest request);
 }
