@@ -20,18 +20,22 @@ public class PeopleController : ControllerBase
     /// Gets a paginated list of people.
     /// </summary>
     /// <param name="pagination">The pagination values</param>
+    /// <param name="orderBy">The ordering values</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A list of people.</returns>
     [HttpGet]
     [Route("")]
     public async Task<IActionResult> GetPeople(
         [FromQuery] PaginationQuery pagination,
+        [FromQuery] PeopleOrderByQuery orderBy,
         CancellationToken cancellationToken = default)
     {
         var people =
             await peopleService.GetPeople(
                 pagination.PageNumber,
                 pagination.PageSize,
+                orderBy.OrderBy,
+                orderBy.IsDescending,
                 cancellationToken);
 
         return Ok(people);

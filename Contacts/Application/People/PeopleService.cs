@@ -39,9 +39,12 @@ public class PeopleService : IPeopleService
     public async Task<PagedResponse<PersonResponse>> GetPeople(
         int pageNumber,
         int pageSize,
+        PeopleOrderByField orderBy,
+        bool isDescending,
         CancellationToken cancellationToken)
     {
         var people = db.People.AsNoTracking();
+
         var totalCount = await people.LongCountAsync(cancellationToken);
 
         var skip = (pageNumber - 1) * pageSize;
@@ -51,22 +54,22 @@ public class PeopleService : IPeopleService
                 pageNumber,
                 pageSize,
                 totalCount,
-                new List<PersonResponse>());
+                []);
         }
 
         var data =
             await people
-            .Skip(skip)
-            .Take(pageSize)
-            .Select(p =>
-                new PersonResponse(
-                    p.Id,
-                    p.FirstName,
-                    p.LastName,
-                    p.Company,
-                    p.CreatedAt,
-                    p.UpdatedAt))
-            .ToListAsync(cancellationToken);
+                .ApplyOrdering(orderBy, isDescending)
+                .ApplyPaging(pageNumber, pageSize)
+                .Select(p =>
+                    new PersonResponse(
+                        p.Id,
+                        p.FirstName,
+                        p.LastName,
+                        p.Company,
+                        p.CreatedAt,
+                        p.UpdatedAt))
+                .ToListAsync(cancellationToken);
 
         return new PagedResponse<PersonResponse>(pageNumber, pageSize, totalCount, data);
     }

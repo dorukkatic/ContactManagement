@@ -1,5 +1,6 @@
 ﻿using Bogus;
 using Contacts.Application.People;
+using Contacts.Contracts.People;
 using FluentAssertions;
 using FluentAssertions.Common;
 
@@ -97,7 +98,7 @@ public class PeopleServiceTests : PeopleTestBase, IAsyncLifetime
         int pageNumber, int pageSize)
     {
         var result =
-            await peopleService.GetPeople(pageNumber, pageSize, CancellationToken.None);
+            await peopleService.GetPeople(pageNumber, pageSize, PeopleOrderByField.FirstName, false, CancellationToken.None);
 
         result.PageNumber.Should().Be(pageNumber);
         result.PageSize.Should().Be(pageSize);
@@ -112,7 +113,7 @@ public class PeopleServiceTests : PeopleTestBase, IAsyncLifetime
         var pageSize = new Random().Next(PeopleCount + 1, 99);
 
         var result =
-            await peopleService.GetPeople(pageNumber, pageSize, CancellationToken.None);
+            await peopleService.GetPeople(pageNumber, pageSize, PeopleOrderByField.FirstName, false, CancellationToken.None);
 
         result.PageNumber.Should().Be(pageNumber);
         result.PageSize.Should().Be(pageSize);
