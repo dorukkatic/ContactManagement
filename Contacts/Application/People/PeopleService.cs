@@ -1,7 +1,6 @@
 ﻿using Contacts.Contracts.Common;
 using Contacts.Contracts.People;
 using Contacts.DataAccess;
-using Contacts.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace Contacts.Application.People;
@@ -15,15 +14,15 @@ public class PeopleService : IPeopleService
         this.db = db;
     }
 
-    public Task<Guid> AddPerson(AddPersonRequest request)
+    public async Task<Guid> AddPerson(AddPersonRequest request)
     {
         var mapper = new PersonMapper();
         var person = mapper.AddPersonRequestToPerson(request);
 
         db.People.Add(person);
-        db.SaveChanges();
+        await db.SaveChangesAsync();
 
-        return Task.FromResult(person.Id);
+        return person.Id;
     }
 
     public async Task<PersonResponse?> GetPersonById(Guid id)

@@ -1,4 +1,5 @@
 ﻿using Contacts.Contracts.Common;
+using Contacts.Contracts.ContactInfos;
 using Contacts.Contracts.People;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +11,14 @@ namespace Contacts.WebApi.Controllers;
 public class PeopleController : ControllerBase
 {
     private readonly IPeopleService peopleService;
+    private readonly IContactInfosService contactInfosService;
 
-    public PeopleController(IPeopleService peopleService)
+    public PeopleController(
+        IPeopleService peopleService, 
+        IContactInfosService contactInfosService)
     {
         this.peopleService = peopleService;
+        this.contactInfosService = contactInfosService;
     }
 
     /// <summary>
@@ -67,5 +72,13 @@ public class PeopleController : ControllerBase
         if (person is null) return NotFound(new { Message = $"Person with ID {id} was not found." });
 
         return Ok(person);
+    }
+
+    [HttpPost]
+    [Route("{id:guid}/contact-info")]
+    public async Task<IActionResult> AddContactInfoToPerson(Guid id, [FromBody] AddContactInfoRequest request)
+    {
+        await contactInfosService.AddContactInfo(id, request);
+        return CreatedAtAction(nameof(GetPersonById), new { id = id }, null);
     }
 }

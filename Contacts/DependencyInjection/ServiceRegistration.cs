@@ -1,6 +1,8 @@
 ﻿using Contacts.Application;
+using Contacts.Application.ContactInfos;
 using Contacts.Application.People;
 using Contacts.Contracts;
+using Contacts.Contracts.ContactInfos;
 using Contacts.Contracts.People;
 using Contacts.DataAccess;
 using FluentValidation;
@@ -19,6 +21,8 @@ public static class ServiceRegistration
             options.UseNpgsql(connectionString));
         
         services.AddScoped<IPeopleService, PeopleService>();
+        services.AddScoped<IContactInfosService, ContactInfosService>();
+        
         services.AddFluentValidation();
         services.AddSingleton(TimeProvider.System);
 

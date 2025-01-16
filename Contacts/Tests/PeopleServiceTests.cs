@@ -6,7 +6,7 @@ using FluentAssertions.Common;
 
 namespace Contracts.Application.Tests.Unit;
 
-public class PeopleServiceTests : PeopleTestBase, IAsyncLifetime
+public class PeopleServiceTests : ContactsTestBase, IAsyncLifetime
 {
     private const int PeopleCount = 10;
 

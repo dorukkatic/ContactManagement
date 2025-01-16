@@ -9,5 +9,10 @@ public class PeopleConfiguration : IEntityTypeConfiguration<Person>
     public void Configure(EntityTypeBuilder<Person> builder)
     {
         builder.ToTable("People");
+        
+        builder.HasMany(p => p.ContactInfos)
+            .WithOne(ci => ci.Person)
+            .HasForeignKey(ci => ci.PersonId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
