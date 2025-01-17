@@ -38,6 +38,8 @@ public static class ServiceRegistration
         services.AddMassTransit(messagingSettings);
 
         services.AddTransient<IEventBus, EventBus>();
+        services.AddScoped<IReportGeneratorFactory, ReportGeneratorFactory>();
+        services.AddTransient<IReportGenerator, PeopleByLocationReportGenerator>();
 
         services.TryAddScoped<IReportService, ReportService>();
         services.TryAddScoped<IInternalReportService, ReportService>();

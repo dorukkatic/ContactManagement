@@ -44,6 +44,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContactReports.WebApi", "Co
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B48696EB-36C4-4246-8218-9ECDA62EF6E4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContactManagement.ApiGateway", "ContactManagement.ApiGateway\ContactManagement.ApiGateway.csproj", "{C26DCA61-32E0-4F96-8F2F-69660EF3A384}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -106,6 +108,10 @@ Global
 		{4C778B4D-FD72-4E20-9E4C-35E8DFFDD5E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C778B4D-FD72-4E20-9E4C-35E8DFFDD5E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C778B4D-FD72-4E20-9E4C-35E8DFFDD5E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C26DCA61-32E0-4F96-8F2F-69660EF3A384}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C26DCA61-32E0-4F96-8F2F-69660EF3A384}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C26DCA61-32E0-4F96-8F2F-69660EF3A384}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C26DCA61-32E0-4F96-8F2F-69660EF3A384}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
