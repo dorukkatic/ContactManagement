@@ -106,4 +106,15 @@ public class PeopleController : ControllerBase
 
         return result.IsFailed ? NotFound() : NoContent();
     }
+
+    [HttpDelete]
+    [Route("contact-info/{contactInfoId:guid}")]
+    public async Task<IActionResult> DeleteContactInfo(Guid contactInfoId)
+    {
+        var result = await contactInfosService.DeleteContactInfo(contactInfoId);
+        
+        if(result.IsFailed) return NotFound();
+        
+        return NoContent();
+    }
 }

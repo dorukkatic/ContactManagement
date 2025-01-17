@@ -39,6 +39,16 @@ public class ContactInfosService : IContactInfosService
         return await AddContactInfo(location);
     }
 
+    public async Task<Result> DeleteContactInfo(Guid id)
+    {
+        var contactInfo = await db.ContactInfos.FindAsync(id);
+        if(contactInfo == null) return Result.Fail("Contact info doesn't exist");
+        
+        db.ContactInfos.Remove(contactInfo);
+        await db.SaveChangesAsync();
+        return Result.Ok();
+    }
+
     private async Task<Result<Guid>> AddContactInfo(ContactInfo contactInfo)
     {        
         var isPersonExist = await db.People.AnyAsync(p => p.Id == contactInfo.PersonId);

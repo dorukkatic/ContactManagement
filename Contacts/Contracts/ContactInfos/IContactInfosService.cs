@@ -6,4 +6,5 @@ public interface IContactInfosService
 {
     Task<Result<Guid>> AddContactInfo(Guid personId, AddContactInfoRequest request);
     Task<Result<Guid>> AddLocation(Guid personId, AddLocationRequest request);
+    Task<Result> DeleteContactInfo(Guid id);
 }
