@@ -1,8 +1,13 @@
 ﻿using Bogus;
+using Contacts.Application.ContactInfos;
 using Contacts.Application.People;
+using Contacts.Contracts.Common;
+using Contacts.Contracts.ContactInfos;
 using Contacts.Contracts.People;
 using FluentAssertions;
 using FluentAssertions.Common;
+using FluentResults;
+using NSubstitute;
 
 namespace Contracts.Application.Tests.Unit;
 
@@ -11,10 +16,12 @@ public class PeopleServiceTests : ContactsTestBase, IAsyncLifetime
     private const int PeopleCount = 10;
 
     private readonly PeopleService peopleService;
+    private readonly IContactInfosService contactInfoMock;
 
     public PeopleServiceTests()
     {
-        peopleService = new PeopleService(db);
+        contactInfoMock = Substitute.For<IContactInfosService>(); 
+        peopleService = new PeopleService(db, contactInfoMock);
     }
 
     [Theory]
@@ -67,7 +74,7 @@ public class PeopleServiceTests : ContactsTestBase, IAsyncLifetime
         var person = db.People.First();
 
         // Act
-        var result = await peopleService.GetPersonById(person.Id);
+        var result = (await peopleService.GetPersonById(person.Id)).Value;
 
         // Assert
         result.Should().NotBeNull();
@@ -78,7 +85,7 @@ public class PeopleServiceTests : ContactsTestBase, IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetPersonByIdAsync_ShouldReturnNull_WhenIdIsInvalid()
+    public async Task GetPersonByIdAsync_ShouldReturnFailed_WhenIdIsInvalid()
     {
         // Arrange
         var invalidId = Guid.NewGuid();
@@ -87,7 +94,7 @@ public class PeopleServiceTests : ContactsTestBase, IAsyncLifetime
         var result = await peopleService.GetPersonById(invalidId);
 
         // Assert
-        result.Should().BeNull();
+        result.IsFailed.Should().BeTrue();
     }
 
     [Theory]
@@ -120,6 +127,70 @@ public class PeopleServiceTests : ContactsTestBase, IAsyncLifetime
         result.TotalCount.Should().Be(PeopleCount); // Seeded 10 people
         result.Data.Should().BeEmpty();
     }
+    
+    [Fact]
+    public async Task DeletePerson_ShouldRemovePerson_WhenIdIsValid()
+    {
+        var person = db.People.First();
+
+        var result = await peopleService.DeletePerson(person.Id);
+        var deletedPerson = await db.People.FindAsync(person.Id);
+
+        result.IsSuccess.Should().BeTrue();
+        deletedPerson.Should().BeNull();
+    }
+    
+    [Fact]
+    public async Task DeletePerson_ShouldReturnFailed_WhenIdIsInvalid()
+    {
+        // Arrange
+        var invalidId = Guid.NewGuid();
+    
+        // Act
+        var result = await peopleService.DeletePerson(invalidId);
+    
+        // Assert
+        result.IsFailed.Should().BeTrue();
+    }
+    
+    [Fact]
+    public async Task GetPersonByIdAsync_ShouldReturnPersonWithContactInfos_WhenIdIsValid()
+    {
+        // Arrange
+        var person = db.People.First();
+        var contactInfoFaker = new Faker<ContactInfoResponse>().CustomInstantiator(f =>
+        {
+            var type = f.PickRandom<ContactInfoTypeDTO>();
+            return new ContactInfoResponse(
+                f.Random.Guid(),
+                type,
+                f.Internet.Email(),
+                f.Random.Guid(),
+                f.Date.Soon(),
+                f.Date.Soon()
+            );
+        });
+        var contactInfo = contactInfoFaker.Generate();
+        contactInfoMock.GetContactInfos(person.Id, 1, 10).Returns(
+            Task.FromResult(
+                new PagedResponse<ContactInfoResponse>(
+                    1,
+                    10,
+                    1,
+                    new List<ContactInfoResponse> { contactInfo })));
+
+        // Act
+        var result = (await peopleService.GetPersonById(person.Id)).Value;
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Id.Should().Be(person.Id);
+        result.FirstName.Should().Be(person.FirstName);
+        result.LastName.Should().Be(person.LastName);
+        result.Company.Should().Be(person.Company);
+        result.ContactInfos.Data.Should().ContainSingle(c => c.Value == contactInfo.Value);
+    }
+    
 
     protected override async Task SeedDatabaseAsync()
     {

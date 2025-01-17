@@ -36,6 +36,11 @@ builder.Services.AddSwaggerGen(c =>
         Title = "People API",
         Version = version
     });
+    c.SwaggerDoc("Statistics", new OpenApiInfo
+    {
+        Title = "Statistics API",
+        Version = version
+    });
 });
 
 var app = builder.Build();
@@ -46,6 +51,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/People/swagger.json", "People API");
+        c.SwaggerEndpoint("/swagger/Statistics/swagger.json", "Statistics API");
     });
 }
 

@@ -1,4 +1,6 @@
-﻿using Contacts.Contracts.ContactInfos;
+﻿using Contacts.Application.Helpers;
+using Contacts.Contracts.Common;
+using Contacts.Contracts.ContactInfos;
 using Contacts.DataAccess;
 using Contacts.Domain;
 using FluentResults;
@@ -37,6 +39,51 @@ public class ContactInfosService : IContactInfosService
         location.Value = location.Value.ToUpper();
 
         return await AddContactInfo(location);
+    }
+
+    public async Task<Result> DeleteContactInfo(Guid id)
+    {
+        var contactInfo = await db.ContactInfos.FindAsync(id);
+        if(contactInfo == null) return Result.Fail("Contact info doesn't exist");
+        
+        db.ContactInfos.Remove(contactInfo);
+        await db.SaveChangesAsync();
+        return Result.Ok();
+    }
+
+    public async Task<PagedResponse<ContactInfoResponse>> GetContactInfos(Guid personId, int pageNumber, int pageSize)
+    {
+        var mapper = new ContactInfoMapper();
+
+        var contactInfosQuery =
+            db.ContactInfos
+                .AsNoTracking()
+                .Where(ci => ci.PersonId == personId);
+        
+        var total = await contactInfosQuery.LongCountAsync();
+        
+        if (!QueryPagingHelper.ShouldFetchData(pageNumber, pageSize, total))
+        {
+            return new PagedResponse<ContactInfoResponse>(
+                pageNumber,
+                pageSize,
+                total,
+                new List<ContactInfoResponse>());
+        }
+        
+        var contactInfos =
+            await contactInfosQuery
+                .OrderBy(ci => ci.Type)
+                .ThenBy(ci => ci.Value)
+                .ApplyPaging(pageNumber, pageSize)
+                .Select(ci => mapper.ContactInfoToContactInfoResponse(ci))
+                .ToListAsync();
+        
+        return new PagedResponse<ContactInfoResponse>(
+            pageNumber,
+            pageSize,
+            total,
+            contactInfos);
     }
 
     private async Task<Result<Guid>> AddContactInfo(ContactInfo contactInfo)

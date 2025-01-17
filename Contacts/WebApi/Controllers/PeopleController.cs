@@ -69,10 +69,10 @@ public class PeopleController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> GetPersonById(Guid id)
     {
-        var person = await peopleService.GetPersonById(id);
-        if (person is null) return NotFound(new { Message = $"Person with ID {id} was not found." });
+        var personResult = await peopleService.GetPersonById(id);
+        if (personResult.IsFailed) return NotFound();
 
-        return Ok(person);
+        return Ok(personResult.Value);
     }
 
     [HttpPost]
@@ -87,6 +87,15 @@ public class PeopleController : ControllerBase
                 : CreatedAtAction(nameof(GetPersonById), new { id = id }, null);
     }
     
+    [HttpGet]
+    [Route("{id:guid}/contact-info")]
+    public async Task<IActionResult> GetContactInfos(Guid id, [FromQuery] PaginationQuery pagination)
+    {
+        var contactInfos = 
+            await contactInfosService.GetContactInfos(id, pagination.PageNumber, pagination.PageSize);
+        return Ok(contactInfos);
+    }
+    
     [HttpPost]
     [Route("{id:guid}/location")]
     public async Task<IActionResult> AddLocationToPerson(Guid id, [FromBody] AddLocationRequest request)
@@ -96,5 +105,25 @@ public class PeopleController : ControllerBase
             result.IsFailed 
                 ? result.ToActionResult() 
                 : CreatedAtAction(nameof(GetPersonById), new { id = id }, null);
+    }
+    
+    [HttpDelete]
+    [Route("{id:guid}")]
+    public async Task<IActionResult> DeletePerson(Guid id)
+    {
+        var result = await peopleService.DeletePerson(id);
+
+        return result.IsFailed ? NotFound() : NoContent();
+    }
+
+    [HttpDelete]
+    [Route("contact-info/{contactInfoId:guid}")]
+    public async Task<IActionResult> DeleteContactInfo(Guid contactInfoId)
+    {
+        var result = await contactInfosService.DeleteContactInfo(contactInfoId);
+        
+        if(result.IsFailed) return NotFound();
+        
+        return NoContent();
     }
 }
