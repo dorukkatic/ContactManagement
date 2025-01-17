@@ -3,6 +3,7 @@ using Castle.Core.Logging;
 using ContactReports.Application.Abstractions;
 using ContactReports.Application.Reports;
 using ContactReports.Contracts;
+using ContactReports.Contracts.Common;
 using ContactReports.DataAccess;
 using ContactReports.Domain;
 using FluentAssertions;
@@ -155,6 +156,65 @@ public class ReportServiceTests : ReportsTestBase, IAsyncLifetime
         updatedReport?.Data.Should().NotBeNullOrEmpty();
         var updatedStatuses = await db.ReportStatuses.Where(rs => rs.ReportId == report.Id).ToListAsync();
         updatedStatuses.Should().ContainSingle(s => s.Status == Status.Created && s.IsEnabled);
+    }
+    
+    [Fact]
+    public async Task GetReports_ShouldReturnPagedReports()
+    {
+        var report = new Report
+        {
+            Type = ReportType.PeopleByLocation,
+            Statuses = new List<ReportStatus> { new() { Status = Status.Requested, IsEnabled = true } }
+        };
+        db.Reports.Add(report);
+        await db.SaveChangesAsync();
+
+        var pagination = new PaginationQuery(1, 10);
+        var result = await reportService.GetReports(pagination);
+
+        result.Data.Should().HaveCount(1);
+        result.Data.First().Id.Should().Be(report.Id);
+    }
+    
+    [Fact]
+    public async Task GetReports_ShouldReturnEmptyWhenNoReports()
+    {
+        var pagination = new PaginationQuery(1, 10);
+        var result = await reportService.GetReports(pagination);
+
+        result.Data.Should().BeEmpty();
+    }
+    
+    [Fact]
+    public async Task GetReportType_ShouldReturnFailWhenReportIdIsEmpty()
+    {
+        var result = await reportService.GetReportType(Guid.Empty);
+
+        result.IsFailed.Should().BeTrue();
+        result.Errors.First().Message.Should().Be("Report not found");
+    }
+    
+    [Fact]
+    public async Task UpdateReportData_ShouldFailWhenReportNotFound()
+    {
+        var reportId = Guid.NewGuid();
+        const string newData = "Updated Data";
+
+        await reportService.UpdateReportData(reportId, newData);
+
+        var updatedReport = await db.Reports.FirstOrDefaultAsync(r => r.Id == reportId);
+        updatedReport.Should().BeNull();
+    }
+    
+    [Fact]
+    public async Task GenerateReport_ShouldFailWhenReportNotFound()
+    {
+        var reportId = Guid.NewGuid();
+
+        await reportService.GenerateReport(reportId, CancellationToken.None);
+
+        var updatedReport = await db.Reports.FirstOrDefaultAsync(r => r.Id == reportId);
+        updatedReport.Should().BeNull();
     }
 
 }

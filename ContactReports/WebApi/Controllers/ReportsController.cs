@@ -1,4 +1,5 @@
 ﻿using ContactReports.Contracts;
+using ContactReports.Contracts.Common;
 using FluentResults.Extensions.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,5 +35,13 @@ public class ReportsController : ControllerBase
         [FromRoute] Guid id)
     {
         return Ok();
+    }
+    
+    [HttpGet]
+    [Route("")]
+    public async Task<IActionResult> GetReports([FromQuery] PaginationQuery pagination)
+    {
+        var reports = await reportService.GetReports(pagination);
+        return Ok(reports);
     }
 }

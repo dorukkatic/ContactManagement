@@ -15,7 +15,6 @@ public abstract class ReportsTestBase : IDisposable
     
     protected ReportsTestBase()
     {
-        
         var connection = new SqliteConnection("DataSource=:memory:");
         connection.Open();
 
