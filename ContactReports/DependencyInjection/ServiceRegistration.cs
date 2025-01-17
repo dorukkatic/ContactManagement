@@ -1,10 +1,12 @@
 ﻿using ContactReports.Application.Abstractions;
 using ContactReports.Application.Reports;
+using ContactReports.Application.Reports.Configurations;
 using ContactReports.Contracts;
 using ContactReports.DataAccess;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace ContactReports.DependencyInjection;
 
@@ -13,18 +15,33 @@ public static class ServiceRegistration
     public static IServiceCollection AddContactReportsServices(
         this IServiceCollection services, 
         string connectionString,
-        MessagingSettings messagingSettings)
+        MessagingSettings messagingSettings,
+        PeopleServiceClientConfig peopleServiceClientConfig)
     {
         services.AddDbContext<ContactReportsDbContext>(options =>
             options.UseNpgsql(connectionString));
         
+        services.AddHttpClient(peopleServiceClientConfig.ClientName, client =>
+        {
+            client.BaseAddress = new Uri(peopleServiceClientConfig.BaseUrl);
+        });
+        
+        services.Configure<PeopleServiceClientConfig>(options =>
+        {
+            options.ClientName = peopleServiceClientConfig.ClientName;
+            options.BaseUrl = peopleServiceClientConfig.BaseUrl;
+            options.PeopleStatisticsEndpoint = peopleServiceClientConfig.PeopleStatisticsEndpoint;
+        });
+        
         services.AddSingleton(TimeProvider.System);
 
         services.AddMassTransit(messagingSettings);
-        
 
         services.AddTransient<IEventBus, EventBus>();
-        services.AddScoped<IReportService, ReportService>();
+
+        services.TryAddScoped<IReportService, ReportService>();
+        services.TryAddScoped<IInternalReportService, ReportService>();
+
 
         return services;
     }

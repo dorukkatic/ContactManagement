@@ -1,22 +1,23 @@
 ﻿using ContactReports.Contracts;
+using ContactReports.Domain;
 using MassTransit;
-using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace ContactReports.Application.Reports;
 
 public class ReportRequestedEventConsumer : IConsumer<ReportRequestedEvent>
 {
-    private readonly ILogger<ReportRequestedEventConsumer> logger;
+    private readonly IInternalReportService reportService;
 
-    public ReportRequestedEventConsumer(ILogger<ReportRequestedEventConsumer> logger)
+    public ReportRequestedEventConsumer(IInternalReportService reportService)
     {
-        this.logger = logger;
+        this.reportService = reportService;
     }
 
-    public Task Consume(ConsumeContext<ReportRequestedEvent> context)
+    public async Task Consume(ConsumeContext<ReportRequestedEvent> context)
     {
-        logger.LogInformation("Received report requested event with report id {ReportId}", context.Message.ReportId);
-        
-        return Task.CompletedTask;    
+        var reportId=  context.Message.ReportId;
+
+        await reportService.GenerateReport(reportId, context.CancellationToken);
     }
 }

@@ -1,9 +1,11 @@
 ﻿using Contacts.Application;
 using Contacts.Application.ContactInfos;
 using Contacts.Application.People;
+using Contacts.Application.Statistics;
 using Contacts.Contracts;
 using Contacts.Contracts.ContactInfos;
 using Contacts.Contracts.People;
+using Contacts.Contracts.Statistics;
 using Contacts.DataAccess;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +24,7 @@ public static class ServiceRegistration
         
         services.AddScoped<IPeopleService, PeopleService>();
         services.AddScoped<IContactInfosService, ContactInfosService>();
+        services.AddScoped<IStatisticsService, StatisticsService>();
         
         services.AddFluentValidation();
         services.AddSingleton(TimeProvider.System);
