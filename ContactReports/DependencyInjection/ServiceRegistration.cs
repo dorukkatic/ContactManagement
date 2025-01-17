@@ -3,6 +3,7 @@ using ContactReports.Application.Reports;
 using ContactReports.Application.Reports.Configurations;
 using ContactReports.Contracts;
 using ContactReports.DataAccess;
+using FluentValidation;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,6 +37,7 @@ public static class ServiceRegistration
         services.AddSingleton(TimeProvider.System);
 
         services.AddMassTransit(messagingSettings);
+        services.AddFluentValidation();
 
         services.AddTransient<IEventBus, EventBus>();
         services.AddScoped<IReportGeneratorFactory, ReportGeneratorFactory>();
@@ -45,6 +47,12 @@ public static class ServiceRegistration
         services.TryAddScoped<IInternalReportService, ReportService>();
 
 
+        return services;
+    }
+    
+    private static IServiceCollection AddFluentValidation(this IServiceCollection services)
+    {
+        services.AddValidatorsFromAssembly(typeof(AssemblyReference).Assembly);
         return services;
     }
     

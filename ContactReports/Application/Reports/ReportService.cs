@@ -93,6 +93,44 @@ public class ReportService : IReportService, IInternalReportService
         return new PagedResponse<ReportResponse>(pagination.PageNumber, pagination.PageSize, totalCount, reports);
     }
 
+    public async Task<Result<ReportDetailResponse>> GetReport(Guid id)
+    {
+        var typeMapper = new ReportTypeMapper();
+        var statusMapper = new ReportStatusMapper();
+        
+        var report =
+            await db.Reports
+                .Include(r => r.Statuses)
+                .AsNoTracking()
+                .Where(r => r.Id == id)
+                .Select(r => 
+                    new 
+                    {
+                        r.Id,
+                        r.Type,
+                        Status = statusMapper.MapStatusDtoToReportStatus(r.Statuses.First(s => s.IsEnabled).Status),
+                        RequestedAt = r.Statuses.First(s => s.Status == Status.Requested).CreatedAt,
+                        CreatedAt = r.Statuses.FirstOrDefault(s => s.Status == Status.Created) == null 
+                            ? (DateTime?)null
+                            : r.Statuses.First(s => s.Status == Status.Created).CreatedAt,
+                        r.Data
+                    })
+                .FirstOrDefaultAsync();
+        
+        if(report == null) return Result.Fail("Report not found");
+        
+        var reportType = report.Type;
+        var reportObjectType = reportType.GetReportObjectType();
+        
+        return new ReportDetailResponse(
+            report.Id,
+            typeMapper.MapReportTypeToReportTypeDto(report.Type),
+            report.Status,
+            report.RequestedAt,
+            report.CreatedAt,
+            report.Data == null ? null : JsonConvert.DeserializeObject(report.Data, reportObjectType));
+    }
+
     public async Task<Result<ReportType>> GetReportType(Guid reportId)
     {
         var report =
@@ -151,12 +189,24 @@ public class ReportService : IReportService, IInternalReportService
             logger.LogError("Report with id {reportId} not found", reportId);
             return;
         }
+
+        var reportType = reportTypeResult.Value;
         
         await ChangeReportStatus(reportId, Status.Creating);
         
-        var reportGenerator = reportGeneratorFactory.GetReportGenerator(reportTypeResult.Value);
+        var reportGenerator = reportGeneratorFactory.GetReportGenerator(reportType);
         var reportData = 
-            await reportGenerator.GenerateReport<IEnumerable<PeopleCountByLocation>>(contextCancellationToken);
+            await reportGenerator.GenerateReport(contextCancellationToken);
+
+        if (reportData.IsFailed)
+        {
+            logger.LogError(
+                "Report with id {reportId} failed to generate.Error reason: {reason}", 
+                reportId,
+                reportData.Errors.First());
+            
+            await ChangeReportStatus(reportId, Status.Failed);            
+        }
 
         await UpdateReportData(reportId, JsonConvert.SerializeObject(reportData.Value));
         

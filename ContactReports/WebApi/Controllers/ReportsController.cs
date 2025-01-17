@@ -34,7 +34,11 @@ public class ReportsController : ControllerBase
     public async Task<IActionResult> GetReport(
         [FromRoute] Guid id)
     {
-        return Ok();
+        var result = await reportService.GetReport(id);
+
+        if (result.IsFailed) return NotFound();
+        
+        return Ok(result.Value);
     }
     
     [HttpGet]

@@ -13,7 +13,8 @@ public class ReportGeneratorFactory : IReportGeneratorFactory
     
     public IReportGenerator GetReportGenerator(ReportType reportType)
     {
-        var reportGenerator = reportGenerators.FirstOrDefault(rg => rg.CanGenerate(reportType));
+        var reportGenerator = 
+            reportGenerators.FirstOrDefault(rg => rg.CanGenerate(reportType));
         
         if (reportGenerator == null)
         {

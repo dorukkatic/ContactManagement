@@ -10,11 +10,12 @@ using FluentAssertions;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using NSubstitute;
 
 namespace ContactReports.Application.Tests.Unit;
 
-public class ReportServiceTests : ReportsTestBase, IAsyncLifetime
+public class ReportServiceTests : ReportsTestBase
 {
     private readonly IEventBus eventBusMock;
     private readonly ReportService reportService;
@@ -27,16 +28,6 @@ public class ReportServiceTests : ReportsTestBase, IAsyncLifetime
         reportGeneratorFactoryMock = Substitute.For<IReportGeneratorFactory>();
         logger = Substitute.For<ILogger<ReportService>>();
         reportService = new ReportService(db, eventBusMock, logger, reportGeneratorFactoryMock);
-    }
-
-    public async Task InitializeAsync()
-    {
-        // Initialization logic if needed
-    }
-
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
     }
 
     [Theory]
@@ -145,7 +136,7 @@ public class ReportServiceTests : ReportsTestBase, IAsyncLifetime
         var mockDataResult = Result.Ok<IEnumerable<PeopleCountByLocation>>(new List<PeopleCountByLocation>());
 
         var reportGeneratorMock = Substitute.For<IReportGenerator>();
-        reportGeneratorMock.GenerateReport<IEnumerable<PeopleCountByLocation>>(Arg.Any<CancellationToken>())
+        reportGeneratorMock.GenerateReport(Arg.Any<CancellationToken>())
             .Returns(mockDataResult);
         
         reportGeneratorFactoryMock.GetReportGenerator(ReportType.PeopleByLocation).Returns(reportGeneratorMock);
@@ -216,5 +207,37 @@ public class ReportServiceTests : ReportsTestBase, IAsyncLifetime
         var updatedReport = await db.Reports.FirstOrDefaultAsync(r => r.Id == reportId);
         updatedReport.Should().BeNull();
     }
+    
+    [Fact]
+    public async Task GetReport_ShouldReturnFailWhenReportNotFound()
+    {
+        var result = await reportService.GetReport(Guid.NewGuid());
 
+        result.IsFailed.Should().BeTrue();
+        result.Errors.First().Message.Should().Be("Report not found");
+    }
+    
+    [Fact]
+    public async Task GetReport_ShouldReturnReportDetails()
+    {
+        var report = new Report
+        {
+            Type = ReportType.PeopleByLocation,
+            Statuses = new List<ReportStatus>
+            {
+                new() { Status = Status.Requested, IsEnabled = false },
+                new() { Status = Status.Created, IsEnabled = true }
+            },
+            Data = JsonConvert.SerializeObject(new List<PeopleCountByLocation>())
+        };
+        db.Reports.Add(report);
+        await db.SaveChangesAsync();
+
+        var result = await reportService.GetReport(report.Id);
+
+        result.Value.Id.Should().Be(report.Id);
+        result.Value.ReportType.Should().Be(ReportTypeDto.PeopleByLocation);
+        result.Value.Status.Should().Be(StatusDto.Created);
+        ((IEnumerable<PeopleCountByLocation>?)result.Value.Data).Should().NotBeNull();
+    }
 }
