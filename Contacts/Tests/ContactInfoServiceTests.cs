@@ -3,6 +3,7 @@ using Contacts.Contracts.ContactInfos;
 using Contacts.Domain;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Riok.Mapperly.Abstractions;
 
 namespace Contracts.Application.Tests.Unit;
 
@@ -52,9 +53,9 @@ public class ContactInfoServiceTests : ContactsTestBase, IAsyncLifetime
         var location = await db.ContactInfos.FindAsync(locationId);
 
         location.Should().NotBeNull();
-        location.PersonId.Should().Be(person.Id);
-        location.Value.Should().BeUpperCased(location.Value);
-        location.Type.Should().Be(ContactInfoType.Location);
+        location?.PersonId.Should().Be(person.Id);
+        location?.Value.Should().Be(request.Value.ToUpper());
+        location?.Type.Should().Be(ContactInfoType.Location);
     }
 
     [Fact]
@@ -98,6 +99,70 @@ public class ContactInfoServiceTests : ContactsTestBase, IAsyncLifetime
         var location = await db.ContactInfos.FindAsync(locationId);
         
         location?.Value.Should().BeUpperCased(value);
+    }
+    
+    [Fact]
+    public async Task DeleteContactInfo_ShouldRemoveContactInfoFromDatabase()
+    {
+        var person = db.People.First();
+        var request = AddContactInfoRequestFaker.Generate();
+        var contactInfoId = (await contactInfosService.AddContactInfo(person.Id, request)).Value;
+
+        var deleteResult = await contactInfosService.DeleteContactInfo(contactInfoId);
+        var contactInfo = await db.ContactInfos.FindAsync(contactInfoId);
+
+        deleteResult.IsSuccess.Should().BeTrue();
+        contactInfo.Should().BeNull();
+    }
+    
+    [Fact]
+    public async Task DeleteContactInfo_ShouldReturnFailedResult_WhenContactInfoDoesNotExist()
+    {
+        var invalidContactInfoId = Guid.NewGuid();
+
+        var deleteResult = await contactInfosService.DeleteContactInfo(invalidContactInfoId);
+
+        deleteResult.IsFailed.Should().BeTrue();
+    }
+    
+    [Fact]
+    public async Task GetContactInfos_ShouldReturnPagedResponse()
+    {
+        var person = db.People.First();
+        var request = AddContactInfoRequestFaker.Generate();
+        await contactInfosService.AddContactInfo(person.Id, request);
+
+        var pagedResponse = await contactInfosService.GetContactInfos(person.Id, 1, 10);
+
+        pagedResponse.Should().NotBeNull();
+        pagedResponse.Data.Should().HaveCount(1);
+        pagedResponse.TotalCount.Should().Be(1);
+    }
+    
+    [Fact]
+    public async Task GetContactInfos_ShouldReturnEmptyPagedResponse_WhenPersonHasNoContactInfos()
+    {
+        var person = db.People.First();
+
+        var pagedResponse = await contactInfosService.GetContactInfos(person.Id, 1, 10);
+
+        pagedResponse.Should().NotBeNull();
+        pagedResponse.Data.Should().BeEmpty();
+        pagedResponse.TotalCount.Should().Be(0);
+    }
+    
+    [Fact]
+    public async Task GetContactInfos_ShouldReturnEmptyPagedResponse_WhenPageNumberIsOutOfRange()
+    {
+        var person = db.People.First();
+        var request = AddContactInfoRequestFaker.Generate();
+        await contactInfosService.AddContactInfo(person.Id, request);
+
+        var pagedResponse = await contactInfosService.GetContactInfos(person.Id, 2, 10);
+
+        pagedResponse.Should().NotBeNull();
+        pagedResponse.Data.Should().BeEmpty();
+        pagedResponse.TotalCount.Should().Be(1);
     }
     
     protected override async Task SeedDatabaseAsync()

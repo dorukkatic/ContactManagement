@@ -57,7 +57,7 @@ public abstract class ContactsTestBase : IDisposable
             new Faker<AddContactInfoRequest>()
                 .CustomInstantiator(f =>
                 {
-                    var type = f.PickRandom<ContactInfoTypeDTO>();
+                    var type = f.PickRandomWithout(ContactInfoTypeDTO.Location);
                     
                     var value = type switch
                     {

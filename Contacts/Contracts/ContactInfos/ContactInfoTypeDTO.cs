@@ -3,5 +3,6 @@
 public enum ContactInfoTypeDTO
 {
     Email,
-    Phone
+    Phone,
+    Location
 }

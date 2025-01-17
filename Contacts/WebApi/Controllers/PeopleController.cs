@@ -69,10 +69,10 @@ public class PeopleController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> GetPersonById(Guid id)
     {
-        var person = await peopleService.GetPersonById(id);
-        if (person is null) return NotFound(new { Message = $"Person with ID {id} was not found." });
+        var personResult = await peopleService.GetPersonById(id);
+        if (personResult.IsFailed) return NotFound();
 
-        return Ok(person);
+        return Ok(personResult.Value);
     }
 
     [HttpPost]
@@ -85,6 +85,15 @@ public class PeopleController : ControllerBase
             result.IsFailed
                 ? result.ToActionResult()
                 : CreatedAtAction(nameof(GetPersonById), new { id = id }, null);
+    }
+    
+    [HttpGet]
+    [Route("{id:guid}/contact-info")]
+    public async Task<IActionResult> GetContactInfos(Guid id, [FromQuery] PaginationQuery pagination)
+    {
+        var contactInfos = 
+            await contactInfosService.GetContactInfos(id, pagination.PageNumber, pagination.PageSize);
+        return Ok(contactInfos);
     }
     
     [HttpPost]
