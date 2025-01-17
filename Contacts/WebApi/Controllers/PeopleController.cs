@@ -97,4 +97,13 @@ public class PeopleController : ControllerBase
                 ? result.ToActionResult() 
                 : CreatedAtAction(nameof(GetPersonById), new { id = id }, null);
     }
+    
+    [HttpDelete]
+    [Route("{id:guid}")]
+    public async Task<IActionResult> DeletePerson(Guid id)
+    {
+        var result = await peopleService.DeletePerson(id);
+
+        return result.IsFailed ? NotFound() : NoContent();
+    }
 }

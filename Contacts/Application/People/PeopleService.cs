@@ -1,6 +1,7 @@
 ﻿using Contacts.Contracts.Common;
 using Contacts.Contracts.People;
 using Contacts.DataAccess;
+using FluentResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace Contacts.Application.People;
@@ -71,5 +72,17 @@ public class PeopleService : IPeopleService
                 .ToListAsync(cancellationToken);
 
         return new PagedResponse<PersonResponse>(pageNumber, pageSize, totalCount, data);
+    }
+
+    public async Task<Result> DeletePerson(Guid id)
+    {
+        var person = await db.People.FindAsync(id);
+        
+        if (person == null) return Result.Fail(new Error("Person not found"));
+        
+        db.People.Remove(person);
+        await db.SaveChangesAsync();
+        
+        return Result.Ok();
     }
 }

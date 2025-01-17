@@ -1,4 +1,5 @@
 ﻿using Contacts.Contracts.Common;
+using FluentResults;
 
 namespace Contacts.Contracts.People;
 public interface IPeopleService
@@ -11,4 +12,6 @@ public interface IPeopleService
         PeopleOrderByField orderBy,
         bool isDescending,
         CancellationToken cancellationToken);
+
+    Task<Result> DeletePerson(Guid id);
 }
