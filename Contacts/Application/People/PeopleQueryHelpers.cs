@@ -25,12 +25,4 @@ internal static class PeopleQueryHelpers
         };
     }
 
-    internal static IQueryable<Person> ApplyPaging(
-        this IQueryable<Person> people,
-        int pageNumber,
-        int pageSize)
-    {
-        return people.Skip((pageNumber - 1) * pageSize).Take(pageSize);
-    }
-
 }
