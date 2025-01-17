@@ -55,6 +55,8 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    app.Services.RunDbMigrations();
+    
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
