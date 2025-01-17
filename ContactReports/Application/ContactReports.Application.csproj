@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentResults" Version="3.16.0" />
+    <PackageReference Include="MassTransit" Version="8.3.4" />
     <PackageReference Include="Riok.Mapperly" Version="4.1.1" />
   </ItemGroup>
 

@@ -1,8 +1,7 @@
-﻿version: '3.8'
-services:
+﻿services:
   postgres:
     image: postgres:15
-    container_name: postgres_contacts
+    container_name: ContactManagement.Db
     restart: always
     ports:
       - "5432:5432"
@@ -12,5 +11,22 @@ services:
       POSTGRES_DB: ContactManagementDb
     volumes:
       - postgres_data:/var/lib/postgresql/data
+        
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: ContactManagement.RabbitMQ
+    restart: always
+    hostname: contact-management-mq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitMq-data:/var/lib/rabbitmq
+      - rabbitMq-logs:/var/log/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
 volumes:
   postgres_data:
+  rabbitMq-data:
+  rabbitMq-logs:
