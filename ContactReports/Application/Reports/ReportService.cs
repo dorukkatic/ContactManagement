@@ -1,5 +1,7 @@
 ﻿using ContactReports.Application.Abstractions;
+using ContactReports.Application.Helpers;
 using ContactReports.Contracts;
+using ContactReports.Contracts.Common;
 using ContactReports.DataAccess;
 using ContactReports.Domain;
 using FluentResults;
@@ -52,6 +54,43 @@ public class ReportService : IReportService, IInternalReportService
         await eventBus.Publish(new ReportRequestedEvent(report.Id));
         
         return report.Id;
+    }
+
+    public async Task<PagedResponse<ReportResponse>> GetReports(PaginationQuery pagination)
+    {
+        var reportQuery =
+            db.Reports.Include(r => r.Statuses).AsNoTracking();
+
+        var totalCount = await reportQuery.LongCountAsync();
+
+        if (!QueryPagingHelper.ShouldFetchData(pagination.PageNumber, pagination.PageSize, totalCount))
+        {
+            return new PagedResponse<ReportResponse>(
+                pagination.PageNumber,
+                pagination.PageSize,
+                totalCount,
+                []);
+        }
+
+        var typeMapper = new ReportTypeMapper();
+        var statusMapper = new ReportStatusMapper();
+        
+        var reports =
+            await reportQuery
+                .OrderByDescending(r => r.CreatedAt)
+                .ApplyPaging(pagination.PageNumber, pagination.PageSize)
+                .Select(r => 
+                    new ReportResponse(
+                        r.Id,
+                        typeMapper.MapReportTypeToReportTypeDto(r.Type),
+                        statusMapper.MapStatusDtoToReportStatus(r.Statuses.First(s => s.IsEnabled).Status),
+                        r.Statuses.First(s => s.Status == Status.Requested).CreatedAt,
+                        r.Statuses.FirstOrDefault(s => s.Status == Status.Created) == null 
+                            ? null
+                            : r.Statuses.First(s => s.Status == Status.Created).CreatedAt))
+                .ToListAsync();
+
+        return new PagedResponse<ReportResponse>(pagination.PageNumber, pagination.PageSize, totalCount, reports);
     }
 
     public async Task<Result<ReportType>> GetReportType(Guid reportId)

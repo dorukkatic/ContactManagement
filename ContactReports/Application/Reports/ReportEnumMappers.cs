@@ -8,4 +8,11 @@ namespace ContactReports.Application.Reports;
 public partial class ReportTypeMapper
 {
     public partial ReportType MapReportTypeDtoToReportType(ReportTypeDto reportTypeDto);
+    public partial ReportTypeDto MapReportTypeToReportTypeDto(ReportType reportType);
+}
+
+[Mapper]
+public partial class ReportStatusMapper
+{
+    public partial StatusDto MapStatusDtoToReportStatus(Status reportStatus);
 }
