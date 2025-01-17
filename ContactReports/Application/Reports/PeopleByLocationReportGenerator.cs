@@ -9,15 +9,15 @@ namespace ContactReports.Application.Reports;
 public class PeopleByLocationReportGenerator : IReportGenerator
 {
     private readonly HttpClient peopleStatisticsClient;
-    private readonly PeopleServiceClientConfig peopleServiceClientConfig;
+    private readonly ContactsServiceClientConfig contactsServiceClientConfig;
     private const ReportType GeneratorReportType = ReportType.PeopleByLocation;
 
     public PeopleByLocationReportGenerator(
         IHttpClientFactory httpClientFactory,
-        IOptions<PeopleServiceClientConfig> peopleServiceClientConfig)
+        IOptions<ContactsServiceClientConfig> peopleServiceClientConfig)
     {
-        this.peopleServiceClientConfig = peopleServiceClientConfig.Value;
-        peopleStatisticsClient = httpClientFactory.CreateClient(this.peopleServiceClientConfig.ClientName);
+        this.contactsServiceClientConfig = peopleServiceClientConfig.Value;
+        peopleStatisticsClient = httpClientFactory.CreateClient(this.contactsServiceClientConfig.ClientName);
     }
 
     public bool CanGenerate(ReportType reportType)
@@ -31,7 +31,7 @@ public class PeopleByLocationReportGenerator : IReportGenerator
         {
             var result = 
                 await peopleStatisticsClient.GetAsync(
-                    peopleServiceClientConfig.PeopleStatisticsEndpoint, 
+                    contactsServiceClientConfig.PeopleStatisticsEndpoint, 
                     cancellationToken);
             
             if (!result.IsSuccessStatusCode) 

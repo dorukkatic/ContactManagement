@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container
 var connectionString = builder.Configuration.GetConnectionString("ContactsDb");
 var messagingSettings = builder.Configuration.GetSection("MessagingSettings").Get<MessagingSettings>();
-var peopleServiceClientConfig = builder.Configuration.GetSection("PeopleServiceClientConfig").Get<PeopleServiceClientConfig>();
+var peopleServiceClientConfig = builder.Configuration.GetSection("ContactsServiceClientConfig").Get<ContactsServiceClientConfig>();
 
 if(messagingSettings is null)
 {
