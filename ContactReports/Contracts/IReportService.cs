@@ -7,4 +7,5 @@ public interface IReportService
 {
     Task<Result<Guid>> RequestReport(ReportTypeDto requestedReportType);
     Task<PagedResponse<ReportResponse>> GetReports(PaginationQuery pagination);
+    Task<Result<ReportDetailResponse>> GetReport(Guid id);
 }

@@ -10,6 +10,7 @@ public class PeopleByLocationReportGenerator : IReportGenerator
 {
     private readonly HttpClient peopleStatisticsClient;
     private readonly PeopleServiceClientConfig peopleServiceClientConfig;
+    private const ReportType GeneratorReportType = ReportType.PeopleByLocation;
 
     public PeopleByLocationReportGenerator(
         IHttpClientFactory httpClientFactory,
@@ -21,26 +22,27 @@ public class PeopleByLocationReportGenerator : IReportGenerator
 
     public bool CanGenerate(ReportType reportType)
     {
-        return reportType == ReportType.PeopleByLocation;
+        return GeneratorReportType == reportType;
     }
 
-    public async Task<Result<T>> GenerateReport<T>(CancellationToken cancellationToken = default)
+    public async Task<Result<object>> GenerateReport(CancellationToken cancellationToken = default)
     {
-        var result = 
-            await peopleStatisticsClient.GetAsync(
-                peopleServiceClientConfig.PeopleStatisticsEndpoint, 
-                cancellationToken);
-        
-        if (!result.IsSuccessStatusCode) 
-        {
-            return Result.Fail<T>("Failed to fetch people statistics");
-        }
-        
-        var content = await result.Content.ReadAsStringAsync(cancellationToken);
-
         try
         {
-            var data = JsonConvert.DeserializeObject<T>(content);
+            var result = 
+                await peopleStatisticsClient.GetAsync(
+                    peopleServiceClientConfig.PeopleStatisticsEndpoint, 
+                    cancellationToken);
+            
+            if (!result.IsSuccessStatusCode) 
+            {
+                return Result.Fail("Failed to fetch people statistics");
+            }
+            
+            var content = await result.Content.ReadAsStringAsync(cancellationToken);
+
+            var returnType = GeneratorReportType.GetReportObjectType();
+            var data = JsonConvert.DeserializeObject(content, returnType);
             return 
                 data == null 
                     ? Result.Fail("Failed to deserialize people statistics") 
@@ -48,8 +50,7 @@ public class PeopleByLocationReportGenerator : IReportGenerator
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            return Result.Fail(new Error("Failed to fetch people statistics").CausedBy(e));
         }
     }
 }

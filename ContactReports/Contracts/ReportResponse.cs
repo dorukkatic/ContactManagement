@@ -5,4 +5,4 @@ public record ReportResponse(
     ReportTypeDto ReportType,
     StatusDto Status,
     DateTime RequestedAt,
-    DateTime? CreatedAt);
+    DateTime? GeneratedAt);
