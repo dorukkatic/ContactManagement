@@ -1,10 +1,13 @@
-﻿services:
+﻿  
+services:
   postgres:
     image: postgres:15
     container_name: ContactManagement.Db
     restart: always
     ports:
       - "5432:5432"
+    networks:
+      - contactmanagement
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: setur
@@ -20,20 +23,69 @@
     ports:
       - "5672:5672"
       - "15672:15672"
-    volumes:
-      - rabbitMq-data:/var/lib/rabbitmq
-      - rabbitMq-logs:/var/log/rabbitmq
+    networks:
+      - contactmanagement
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitMq-data:/var/lib/rabbitmq
+      - rabbitMq-logs:/var/log/rabbitmq
+      
   apigateway:
-    image: contactmanagement.apigateway
     build:
       context: .
       dockerfile: ContactManagement.ApiGateway/Dockerfile
+    image: contactmanagement.apigateway
+    networks:
+      - contactmanagement
+    depends_on:
+      - contacts
+      - reports
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    ports:
+      - "8080:8080" # External HTTP access
+      - "8081:8081" # External HTTPS access
+        
+  contacts:
+    build:
+      context: .
+      dockerfile: Contacts/WebApi/Dockerfile
+    image: contacts.webapi
+    networks:
+      - contactmanagement
+    depends_on:
+      - postgres
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__ContactsDb: "Host=postgres;Port=5432;Database=ContactsDb;Username=postgres;Password=setur"
+      
+  reports:
+    build:
+      context: .
+      dockerfile: ContactReports/WebApi/Dockerfile
+    image: reports.webapi
+    networks:
+      - contactmanagement
+    depends_on:
+      - postgres
+      - rabbitmq
+      - contacts
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__ContactsDb: "Host=postgres;Port=5432;Database=ContactsDb;Username=postgres;Password=setur"
+      MessagingSettings__Host: "rabbitmq://rabbitmq/"
+      MessagingSettings__Username: "guest"
+      MessagingSettings__Password: "guest"
+      PeopleServiceClientConfig__BaseUrl: "http://contacts:8080/"# Access by alias internally
       
 volumes:
   postgres_data:
   rabbitMq-data:
   rabbitMq-logs:
+
+networks:
+  contactmanagement:
+    driver: bridge
 
