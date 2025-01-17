@@ -9,6 +9,9 @@ public class ContactReportsDbContext : DbContext
     private const string Schema = "contactReports";
     
     private readonly TimeProvider timeProvider;
+    
+    public DbSet<Report> Reports { get; set; }
+    public DbSet<ReportStatus> ReportStatuses { get; set; }
 
     public ContactReportsDbContext(DbContextOptions<ContactReportsDbContext> options, TimeProvider timeProvider)
         : base(options)

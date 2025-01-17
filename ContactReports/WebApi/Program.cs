@@ -7,13 +7,19 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 var connectionString = builder.Configuration.GetConnectionString("ContactsDb");
+var messagingSettings = builder.Configuration.GetSection("MessagingSettings").Get<MessagingSettings>();
+
+if(messagingSettings is null)
+{
+    throw new InvalidOperationException("Messaging settings not found.");
+}
 
 if(connectionString is null)
 {
     throw new InvalidOperationException("Connection string 'ContactsDb' not found.");
 }
 
-builder.Services.AddContactReportsServices(connectionString);
+builder.Services.AddContactReportsServices(connectionString, messagingSettings);
 
 builder.Services.AddFluentValidationAutoValidation(configuration =>
 {
