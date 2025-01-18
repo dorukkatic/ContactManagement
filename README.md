@@ -88,10 +88,10 @@ The following configurations must be set in the `appsettings.json` file:
   "BaseUrl": "https://localhost:44300/",
   "PeopleStatisticsEndpoint": "statistics/people-count-by-locations"
 }
+```
 
 ### Api Gateway
 - Response overwriting is not implemented thus URLs in the 201 created responses are wrong
-```
 
 ---
 
