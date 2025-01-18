@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container
 var connectionString = builder.Configuration.GetConnectionString("ContactsDb");
 var messagingSettings = builder.Configuration.GetSection("MessagingSettings").Get<MessagingSettings>();
-var peopleServiceClientConfig = builder.Configuration.GetSection("PeopleServiceClientConfig").Get<PeopleServiceClientConfig>();
+var peopleServiceClientConfig = builder.Configuration.GetSection("ContactsServiceClientConfig").Get<ContactsServiceClientConfig>();
 
 if(messagingSettings is null)
 {
@@ -49,12 +49,19 @@ builder.Services.AddSwaggerGen(c =>
         Title = "Reports API",
         Version = version
     });
+    
+    // Set the comments path for the Swagger JSON and UI.
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
 });
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    app.Services.RunDbMigrations();
+    
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {

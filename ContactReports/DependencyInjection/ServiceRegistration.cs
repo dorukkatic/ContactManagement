@@ -17,21 +17,21 @@ public static class ServiceRegistration
         this IServiceCollection services, 
         string connectionString,
         MessagingSettings messagingSettings,
-        PeopleServiceClientConfig peopleServiceClientConfig)
+        ContactsServiceClientConfig contactsServiceClientConfig)
     {
         services.AddDbContext<ContactReportsDbContext>(options =>
             options.UseNpgsql(connectionString));
         
-        services.AddHttpClient(peopleServiceClientConfig.ClientName, client =>
+        services.AddHttpClient(contactsServiceClientConfig.ClientName, client =>
         {
-            client.BaseAddress = new Uri(peopleServiceClientConfig.BaseUrl);
+            client.BaseAddress = new Uri(contactsServiceClientConfig.BaseUrl);
         });
         
-        services.Configure<PeopleServiceClientConfig>(options =>
+        services.Configure<ContactsServiceClientConfig>(options =>
         {
-            options.ClientName = peopleServiceClientConfig.ClientName;
-            options.BaseUrl = peopleServiceClientConfig.BaseUrl;
-            options.PeopleStatisticsEndpoint = peopleServiceClientConfig.PeopleStatisticsEndpoint;
+            options.ClientName = contactsServiceClientConfig.ClientName;
+            options.BaseUrl = contactsServiceClientConfig.BaseUrl;
+            options.PeopleStatisticsEndpoint = contactsServiceClientConfig.PeopleStatisticsEndpoint;
         });
         
         services.AddSingleton(TimeProvider.System);

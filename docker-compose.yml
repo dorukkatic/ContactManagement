@@ -78,7 +78,7 @@ services:
       MessagingSettings__Host: "rabbitmq://rabbitmq/"
       MessagingSettings__Username: "guest"
       MessagingSettings__Password: "guest"
-      PeopleServiceClientConfig__BaseUrl: "http://contacts:8080/"# Access by alias internally
+      ContactsServiceClientConfig__BaseUrl: "http://contacts:8080/"# Access by alias internally
       
 volumes:
   postgres_data:
