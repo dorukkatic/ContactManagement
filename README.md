@@ -103,6 +103,12 @@ Once the services are running, visit `https://localhost:8080/swagger/index.html`
 ### Running Locally
 Alternatively, you can run and debug the services individually via your IDE. Ensure PostgreSQL and RabbitMQ are running by starting the Docker Compose services first. Adjust connection strings and ports in the configuration files to match your local environment.
 
+## Test Coverage
+- Please take into consideration that this report includes projects that don't need tests in our case such as ApiGateway which lowers the total coverage percentage.
+  
+![2025-01-18_03h38_07](https://github.com/user-attachments/assets/8a458d28-9ffe-4b84-a486-ff016352a0bc)
+
+
 ---
 
 Feel free to let me know if additional clarifications are needed!
