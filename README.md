@@ -98,7 +98,9 @@ The easiest way to run the project is using Docker Compose. Run the following co
 ```bash
 docker-compose up --build
 ```
-Once the services are running, visit `https://localhost:8080/swagger/index.html` to interact with the APIs.
+Once the services are running, visit `https://localhost:8080/swagger/index.html` to interact with the APIs. 
+Make sure that all services are running.
+If any services fail to start please try to restart the failed container. Services try to run db migrations on startup and they fail if Postgre is not ready
 
 ### Running Locally
 Alternatively, you can run and debug the services individually via your IDE. Ensure PostgreSQL and RabbitMQ are running by starting the Docker Compose services first. Adjust connection strings and ports in the configuration files to match your local environment.
